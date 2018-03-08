@@ -51,6 +51,9 @@ XMPBackendAdapter = (function(){ var $this = function () {
 		seekPlaybackPosition: function(pos) { 
 			return this.Module.ccall('seekXmpPosition', 'number', ['number'], [pos]);
 		},
+		setPlaybackSpeed: function (speed) {
+			return this.Module.ccall('setXmpTimeFactor', 'number', ['number'], [speed]);
+		},
 
 		getPathAndFilename: function(filename) {
 			return ['/', filename];

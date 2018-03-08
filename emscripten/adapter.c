@@ -130,6 +130,15 @@ void EMSCRIPTEN_KEEPALIVE seekXmpPosition(int pos) {
 	xmp_set_position(c, pos);
 }
 
+void setXmpTimeFactor(double speed) __attribute__((noinline));
+void EMSCRIPTEN_KEEPALIVE setXmpTimeFactor(double speed) {
+	struct context_data *ctx;
+	struct module_data *m;
+	ctx = (struct context_data *)c;
+	m = &ctx->m;
+	m->time_factor = speed * 10.0;
+}
+
 int getXmpMaxPosition() __attribute__((noinline));
 int EMSCRIPTEN_KEEPALIVE getXmpMaxPosition() {
 	struct context_data *ctx = (struct context_data *)c;
