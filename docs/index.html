@@ -1,1 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<!--
+ WebXmp: HTML5 Audio/JavaScript port of XMP.
 
+ 	Copyright (C) 2014 Juergen Wothke
+
+ Original C code of "XMP" (see http://xmp.sourceforge.net/):
+
+   xmp is a module player for Unix-like systems that plays over 90 mainstream and obscure module formats from Amiga, 
+   Atari, Acorn, Apple IIgs and PC, including Protracker (MOD), Scream Tracker 3 (S3M), Fast Tracker II (XM) and 
+   Impulse Tracker (IT) files.
+
+ Credits: The visualization used on this page was strongly "inspired" by this demo:
+ http://html5-demos.appspot.com/static/webaudio/createMediaSourceElement.html
+
+ LICENSE
+ 
+ This library is free software; you can redistribute it and/or modify it
+ under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2.1 of the License, or (at
+ your option) any later version. This library is distributed in the hope
+ that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
+-->
+<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+<title>WebXmp - the xmp music player for the Web</title>
+
+<meta name="description" content="Experimental JavaScript version of ZXTune; it supports formats like: Chip Tracker v1.xx (CHI), Digital Music Maker (DMM), Digital Studio AY/Covox (DST), Extreme Tracker v1.xx (ET1), ProDigiTracker v0.xx (PDT), SQ Digital Tracker (SQD), Sample Tracker (STR) ">
+<meta name="author" content="Juergen Wothke">
+<meta name="keywords" content="Web Audio API, HTML5, JavaScript, Atari, Acorn, Apple IIgs, PC,  Protracker (MOD), Scream Tracker 3 (S3M), Fast Tracker II (XM), Impulse Tracker (IT)">
+
+<link href="stdlib/font.css" rel="stylesheet" type="text/css">
+<link href="stdlib/common.css" rel="stylesheet" type="text/css">
+<link href="add_on.css" rel="stylesheet" type="text/css">
+
+<link rel="image_src" href="screenshot.gif" />
+<meta property="og:image" content="http://www.wothke.ch/webxmp/screenshot.gif" />
+
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+<link type="image/x-icon" href="favicon.ico" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pizzicato/0.6.3/Pizzicato.js"></script>
+
+<script type="text/javascript" src="stdlib/jquery1.11.min.js"></script>
+<script type="text/javascript" src="stdlib/jquery.details.min.js"></script>
+<script type="text/javascript" src="stdlib/scriptprocessor_player.js"></script>
+
+<script>window.openDetails=false;</script>
+<script type="text/javascript" src="stdlib/mini_display.js"></script>
+<script type="text/javascript" src="stdlib/mini_controls.js"></script>
+
+<script type="text/javascript" src="backend_xmp.js"></script>
+<script>
+var playerControls;
+var	songDisplay;
+	
+// configure what music infos to display in SongDisplay
+XMPDisplayAccessor = (function(){ var $this = function (doGetSongInfo) {
+		$this.base.call(this, doGetSongInfo);
+	}; 
+	extend(DisplayAccessor, $this, {
+		getDisplayTitle: function() 	{ return "WebXmp";},
+		getDisplaySubtitle: function() 	{ return "lets play some music..";},
+		getDisplayLine1: function() { return this.getSongInfo().title;},
+		getDisplayLine2: function() { return this.getSongInfo().player; },
+		getDisplayLine3: function() { return ""; }
+	});	return $this; })();
+		
+// link player events to "controls" and "display"
+function doOnTrackEnd(){
+	if (playerControls) playerControls.playNextSong();  
+}
+function doOnTrackReadyToPlay(){ 	
+	ScriptNodePlayer.getInstance().play();
+	songDisplay.redrawSongInfo();
+}
+function doOnPlayerReady() {
+	if (playerControls) playerControls.playNextSong();
+}
+
+function init() {
+	// --------------------------- XMP music player -----------------------
+	var basePath= '';		// not needed here
+	ScriptNodePlayer.createInstance(new XMPBackendAdapter(), basePath, [], true, doOnPlayerReady,
+										doOnTrackReadyToPlay, doOnTrackEnd);
+		
+	// --------------------------- UI - basic player controls --------------
+	var songs = [
+		'',
+
+		
+	];
+	playerControls= new BasicPlayerControls(null, true, false,
+				(function(someSong) {
+						var options= {};
+						return [someSong, options];
+					})
+				);
+
+	// limit rendering to 50% of the available time (XMP is fast so there is no need ..)
+	songDisplay= new SongDisplay(new XMPDisplayAccessor((function(){return playerControls.getSongInfo();})), 
+								[0x6565e6], 0, 0.5, (function(){playerControls.animate()}));
+
+	playerControls.playNextSong();
+}
+</script>
+<!--script type="text/javascript" src="stdlib/analytics.js"></script-->
+</head>
+
+<body onload="init();">
+<div class="tooltip" id="tooltip" alt= "This is a hobby project, but it costs not only time to regularily maintain this site but also money to pay for the internet service provider (etc). If you want to keep this site up and running.. or if you just like my work (see https://jwothke.wordpress.com/) and you'd like to see more of it in the future, please make a contribution. Thank you!"></div>
+
+<details>
+  <summary>What's this?</summary>
+  <div>
+  <p>WebXmp: Experimental JavaScript/HTML5 version of <a href="http://xmp.sourceforge.net/" target="_blank">xmp</a>. (Xmp is a module player that plays over 90 mainstream and obscure module formats from Amiga, Atari, Acorn, Apple IIgs and PC, including Protracker (MOD), Scream Tracker 3 (S3M), Fast Tracker II (XM) and Impulse Tracker (IT) files.)</p>
+ 
+  <p>Bring your own files by dropping them onto the bullseye.</p>
+ 
+  <p>2014 by Juergen Wothke  (The source code can be found <a target="_blank" href="https://github.com/wothke/">here</a>.)</p>
+ 
+  <p>This page does not use any plugins but is based exclusively on the draft version WebAudio API. 
+  You'll need Chrome or Firefox to make it play the music. The visual effects 
+  work best in Chrome. (If Firefox passes out - press 'reload'... it's experimental.)
+  
+  <p>Contrary to most other HTML5 based pages out there, the music here is NOT based on  
+  OscillatorNode based waveforms or the playback of some sampledata file. Instead the samples here 
+  are completely calculated within JavaScript by running the xmp emulator logic.</p>  
+ 
+  <p>Please use the below controls to navigate between the songs that you have dropped on the player:
+  <span id="controls"></span>
+ </div>
+</details>
+<aside></aside>
+<section>
+  <div id="logo" class="logo">
+	<div id="moz-reflect-logo"><canvas  id="logoCanvas"  width="600" height="250"></canvas></div>
+  </div>
+  <div id="spectrum" class="spectrum">
+  	<div id="moz-reflect-spectrum"><canvas id="spectrumCanvas" width="512" height="200"></canvas></div>
+  </div>
+  <div id="drop" class="drop"><img src="target.gif" width=200 height=200/></div><!--see BasicPlayerControls-->
+</section>
+</body>
+</html>
