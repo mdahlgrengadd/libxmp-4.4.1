@@ -95,11 +95,11 @@ function init() {
 		
 	// --------------------------- UI - basic player controls --------------
 	var songs = [
-		'',
+		'./music/dnb1.it',
 
 		
 	];
-	playerControls= new BasicPlayerControls(null, true, false,
+	playerControls= new BasicPlayerControls(songs, true, false,
 				(function(someSong) {
 						var options= {};
 						return [someSong, options];
